@@ -22,8 +22,8 @@ func Test_HandleGetUser(t *testing.T) {
 	userHandler := NewUserHandler(mongoStore)
 	ts := httptest.NewServer(http.HandlerFunc(userHandler.HandleGetUser))
 
-	nreq := 1000
-	for i := 0; i < nreq; i++ {
+	nreq := 1001
+	for i := 1; i < nreq; i++ {
 		id := i%100 + 1
 		url := fmt.Sprintf("%s/?id=%d", ts.URL, id)
 		resp, err := http.Get(url)
@@ -35,7 +35,7 @@ func Test_HandleGetUser(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		fmt.Printf("%+v\n", user)
+		fmt.Printf("Request Number: %d %+v\n", i, user)
 	}
 	fmt.Println("The number of requests we had: ", nreq)
 	fmt.Println("The number of times requests hit db: ", mongoStore.dbHit)
