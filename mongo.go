@@ -17,7 +17,7 @@ func NewMongoStorer(db *mongo.Database, coll string) *MongoUserStorer {
 }
 
 func (m *MongoUserStorer) PopulateDB() {
-	for i := 0; i < 150; i++ {
+	for i := 1; i < 151; i++ {
 		m.db.Collection(m.coll).InsertOne(context.TODO(), bson.M{
 			"id":       i,
 			"username": fmt.Sprintf("user: %v", i),

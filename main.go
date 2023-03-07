@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,6 +22,7 @@ func (u *userHandler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.NotFound(w, r)
+		return
 	}
 
 	user, ok := cache[id]
@@ -30,8 +30,8 @@ func (u *userHandler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		// Go to database
 		user, err := u.userStore.GetUser(id)
 		if err != nil {
-			fmt.Println(err.Error())
-			os.Exit(-1)
+			http.NotFound(w, r)
+			return
 		}
 		cache[id] = user
 		json.NewEncoder(w).Encode(user)
@@ -49,7 +49,7 @@ func main() {
 		panic(err.Error())
 	}
 	ms := NewMongoStorer(client.Database("asessment"), "users")
-	ms.PopulateDB() // Comment this  line for the first trial
+	ms.PopulateDB() // Comment this  line for after the first trial
 	userHandler := NewUserHandler(ms)
 	mux.HandleFunc("/", userHandler.HandleGetUser)
 	fmt.Println("Started development server at: http://localhost:4096")
